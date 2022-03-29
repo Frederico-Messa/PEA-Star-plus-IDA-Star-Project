@@ -59,11 +59,11 @@ def get_relevant_info_data(raw_data, relevant_info_data):
     splitted_raw_data = raw_data.split('\n')
 
     for line in splitted_raw_data:
-        if trigger_keyword[relevant_info_data] in line:
-            value = line.split(trigger_keyword[relevant_info_data])[1].split(' ')[1]
+        if trigger_keywords[relevant_info_data] in line:
+            value = line.split(trigger_keywords[relevant_info_data])[1].split(' ')[1]
             if relevant_info_data == 'time':
                 return value[:-1]
             return value
     else:
-        if relevant_info_data == 'cost' and 'Insolution' in raw_data:
+        if relevant_info_data == 'solution_cost' and 'Insolution' in raw_data:
             return 'Unsovable'
