@@ -1,0 +1,55 @@
+----------------------------------------
+
+first_phase_generating_operators_proxy_ids[successor_state_id] = applicable_operator_proxy.get_id();
+first_phase_predecessors_state_ids_values[successor_state_id] = expanding_node.state_id.value;
+expanding_hash[successor_state_id] = successor_g_value;
+
+----------------------------------------
+
+for (int ancestral_state_id_value: second_phase_predecessors_state_ids_values)
+{
+    if (successor_state_id.value == ancestral_state_id_value)
+    {
+        return IN_PROGRESS;
+    }
+}
+int ancestral_state_id_value = second_phase_initial_node.state_id.value;
+while (ancestral_state_id_value != first_phase_initial_node.state_id.value)
+{
+    ancestral_state_id_value = first_phase_predecessors_state_ids_values[StateID(ancestral_state_id_value, true)];
+    if (successor_state_id.value == ancestral_state_id_value)
+    {
+        return IN_PROGRESS;
+    }
+}
+
+----------------------------------------
+
+while (second_phase_predecessors_state_ids_values.size() > (expanding_node.depth - 1) - second_phase_initial_node.depth)
+{
+    second_phase_predecessors_state_ids_values.pop_back();
+    second_phase_generating_operators_proxy_ids.pop_back();
+}
+----------------------------------------
+
+second_phase_predecessors_state_ids_values.push_back(expanding_node.state_id.value);
+second_phase_generating_operators_proxy_ids.push_back(Hash());
+
+----------------------------------------
+
+Plan plan;
+int ancestral_state_id_value = expanding_node.state_id.value;
+while (not second_phase_predecessors_state_ids_values.empty())
+{
+    plan.push_back(OperatorID(second_phase_generating_operators_proxy_ids.back()[StateID(ancestral_state_id_value, true)]));
+    ancestral_state_id_value = second_phase_predecessors_state_ids_values.back();
+    second_phase_generating_operators_proxy_ids.pop_back();
+    second_phase_predecessors_state_ids_values.pop_back();
+}
+while (ancestral_state_id_value != first_phase_initial_node.state_id.value)
+{
+    plan.push_back(OperatorID(first_phase_generating_operators_proxy_ids[StateID(ancestral_state_id_value, true)]));
+    ancestral_state_id_value = first_phase_predecessors_state_ids_values[StateID(ancestral_state_id_value, true)];
+}
+reverse(plan.begin(), plan.end());
+set_plan(plan);
